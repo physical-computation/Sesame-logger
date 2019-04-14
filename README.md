@@ -1,4 +1,4 @@
-# NIR Scan Nano Python Driver
+# Sesame Logger
 This is a logging system designed to support taking and logging scans captured using the NIR Nano spectrometer by TI.  It also includes support for logging from the Bosch CISS, and the warp platform.
 
 ## Usage
@@ -61,6 +61,8 @@ CissUsbConnectord.py - CISS logging stuff.
 - Warp logger doesn't support hotplug disconnect / reconnect
 - Add an option to the log function to commit every 'n' minutes (should probably make commit* a function of fileStructure class)
 - Spectrometer logger currently uses the last set scan profile.  This could be changed, but need to remember to keep this consistent.
+- Optionally create a readme.md for each sensor directory created, to record sensor position for a print.
+- (Idea), allow timestamped webcam logging, perhaps in sync with spectrometer?
 
 
 ## Notes and References
