@@ -99,11 +99,16 @@ def log_all_info():
 @click.option('--directory_index')
 @click.option('--create_repo/--no-create_repo', default=False)
 @click.option('--logging_level', default="INFO")
+@click.option('--root_dir', default="", type=str)
 @click.pass_context
-def cli(ctx, directory_index, create_repo, logging_level):
+def cli(ctx, directory_index, create_repo, logging_level, root_dir):
     ctx.ensure_object(dict)
     root_folder_name = "sesame-" + str(directory_index).zfill(16)
-    print_file = fileStructure(root_folder_name, create_repo)
+    root_folder_dir = os.path.join(
+        root_dir,
+        root_folder_name
+    )
+    print_file = fileStructure(root_folder_dir, create_repo)
 
     # Setup logging
     if logging_level.lower() == "debug":

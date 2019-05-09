@@ -26,8 +26,8 @@
 # This details how to perform a scan
 
 import time
-from usb import readCommand, writeCommand
-from util import shiftBytes
+from spectrometer.usb import readCommand, writeCommand
+from spectrometer.util import shiftBytes
 import logging
 import asyncio
 import hid
@@ -61,11 +61,13 @@ class Spectrometer():
 
     def reconnect_device(self):
         try:
-            logging.debug("Attempting reconnect to spectrometer")
+
             #TODO Test if this if statement is needed by the HID library
             if self.serial_no:
+                logging.debug("Attempting reconnect to the spectrometer")
                 self.h.open(self.vid, self.pid, self.serial_no)
             else:
+                logging.debug("Attempting reconnect to a spectrometer")
                 self.h.open(self.vid, self.pid)
             self.connected_flag = True
             self.h.set_nonblocking(0)
@@ -98,14 +100,14 @@ class Spectrometer():
                 return
         # Set the active scan configuration
         response = self.write_command(self.h, 0x02, 0x24, [0x01])
-        logging.debug("Set the active scan configuration: ",response)
+        logging.debug("Set the active scan configuration: {}".format(response))
 
         # response = self.read_command(h, 0x02, 0x23)
         # print("Read active scan configuration : ",response)
 
         # Write the start scan command, data 0x00, since we don't want to store the scan in the SD card
         response = self.write_command(self.h, 0x02, 0x18, [0x00])
-        logging.debug("Write the start scan command: ", response)
+        logging.debug("Write the start scan command: {}".format(response))
 
         # Read the device status
         logging.info("Scan in progress")
@@ -123,7 +125,7 @@ class Spectrometer():
         # NNO_CMD_FILE_GET_READSIZE
         # data size in bytes
         data_size = self.read_command(self.h, 0x00, 0x2D, [file_to_read])
-        logging.debug("data size: ", data_size)
+        logging.debug("data size: {}".format(data_size))
         data_size.reverse()
         data_size_combined = shiftBytes(data_size)
 

@@ -3,16 +3,19 @@ This is a logging system designed to support taking and logging scans captured u
 
 ## Usage
 ### Requirements
-In order to use these scripts, it is reccomended to run the scripts using a venv, where all the requirements from the `requirements.txt` can be installed independently of other Python installations on the machine.  The 'main' logging script is sesame_log.py
+In order to use these scripts, it is recommended to run the scripts using a venv, where all the requirements from the `requirements.txt` can be installed independently of other Python installations on the machine.  The 'main' logging script is sesame_log.py
 
 In order to support logging from the NIRScan Nano, the DLPSpectrumLibrary will need to be installed, and compiled on the computer.  These python scripts require a dynamic library to be compiled, which is then wrapped using the python ctypes library. 
-This dynamic library can be compiled using the following steps on MacOS.  Instructions for linux and windows can be found online.
+This dynamic library can be compiled using the following steps on MacOS.  Instructions for linux and windows can be found online, the main difference will be the `.dylib` file extension.
 ```
 gcc -c -DTPL_NOLIB -Wall dlpspec.c dlpspec_scan.c dlpspec_calib.c dlpspec_util.c tpl.c dlpspec_scan_col.c dlpspec_scan_had.c dlpspec_helper.c
 clang -dynamiclib -o libtest.dylib dlpspec.o dlpspec_scan.o dlpspec_calib.o dlpspec_util.o tpl.o dlpspec_scan_had.o dlpspec_scan_col.o dlpspec_helper.o
 rm *.o
 ```
-Currently, the full path of the c library is referred to in test_dll.py, and should be updated to reflect the installation.
+Currently, the full path of the compiled library `libtest` should then be placed in the `DLPSPECLIB_DYNAMIC` enviroment variable.  This can be done suing the followign command:
+```
+export DLPSPECLIB_DYNAMIC="/Path/To/Library/DLPSpectrumLibrary_2.0.2/src/libtest.dylib"
+```
 
 ### File Breakdown
 #### sesame_log.py

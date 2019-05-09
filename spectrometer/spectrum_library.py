@@ -1,5 +1,6 @@
 import ctypes
 import json
+import os
 
 
 class calibCoeffs(ctypes.Structure):
@@ -62,7 +63,8 @@ class scanResults(ctypes.Structure):
         ("length", ctypes.c_int)
     ]
 
-dlp_nano_lib = ctypes.CDLL("/Users/thomasgarry/ti/DLPSpectrumLibrary_2.0.2/src/libtest.dylib")
+
+dlp_nano_lib = ctypes.CDLL(os.environ.get('DLPSPECLIB_DYNAMIC', None))
 dlp_nano_lib.dlpspec_scan_interpret.argtypes = [ctypes.c_void_p, ctypes.c_size_t, ctypes.POINTER(scanResults)]
 
 

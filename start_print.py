@@ -1,8 +1,6 @@
 import os
-import asyncio
-import CissUsbConnectord
+from ciss import CissUsbConnectord
 import time
-import hid
 import logging
 import platform
 import threading
@@ -11,8 +9,8 @@ import pylink
 from collections import deque
 
 
-from scan import Spectrometer, NNO_FILE_REF_CAL_COEFF, NNO_FILE_SCAN_DATA
-from spectrum_library import scan_interpret
+from spectrometer.scan import Spectrometer, NNO_FILE_REF_CAL_COEFF, NNO_FILE_SCAN_DATA
+from spectrometer.spectrum_library import scan_interpret
 
 
 
@@ -200,7 +198,7 @@ def start_seggr_log(running, folder, target_device):
                     pass
                     # sys.stdout.write("".join(map(chr, terminal_bytes)))
                     # sys.stdout.flush()
-                time.sleep(0.01)
+                # time.sleep(0.01)
             logging.info("JLink disconnected, exiting...")
         except Exception:
             logging.error("something with warp went wrong :'(")
