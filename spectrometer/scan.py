@@ -99,8 +99,8 @@ class Spectrometer():
             if not self.reconnect_device():
                 return
         # Set the active scan configuration
-        response = self.write_command(self.h, 0x02, 0x24, [0x01])
-        logging.debug("Set the active scan configuration: {}".format(response))
+        # response = self.write_command(self.h, 0x02, 0x24, [0x01])
+        # logging.debug("Set the active scan configuration: {}".format(response))
 
         # response = self.read_command(h, 0x02, 0x23)
         # print("Read active scan configuration : ",response)

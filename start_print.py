@@ -147,7 +147,7 @@ def start_spectrometer_log(running, folder, serial_no=None):
     spectrometer = Spectrometer(0x0451, 0x4200, serial_no)
 
     while(running.is_set()):
-        time.sleep(5)
+        # time.sleep(5)
         read_spectrometer_save(spectrometer, folder)
 
 def start_seggr_log(running, folder, target_device):
@@ -182,6 +182,7 @@ def start_seggr_log(running, folder, target_device):
                     while(1):
                         try:
                             end_line = character_buffer.index('\n')
+                            logging.debug("New line found")
                             line_count += 1
                             minutes_per_csv = 10
                             csv_timestamp = int(int(time.time() / (60 * minutes_per_csv)) * 60 * minutes_per_csv * 1000)
@@ -227,4 +228,3 @@ def main():
 if __name__ == '__main__':
     setup_print()
     main()
-

@@ -14,6 +14,12 @@ from start_print import start_spectrometer_log, start_ciss_log, start_seggr_log
 class fileStructure():
     def __init__(self, root_folder_name, create_repo=False):
         self.root_folder_name = root_folder_name
+
+        if self.root_folder_name[-1] in ["/", "\\"]:
+            self.repo_name = os.path.split(self.root_folder_name[:-1])[1]
+        else:
+            self.repo_name = os.path.split(self.root_folder_name)[1]
+        print("repo name {}".format(self.repo_name))
         self.measurements_folder_name = "Measurements"
         self.to_commit = []
 
@@ -37,6 +43,7 @@ class fileStructure():
                 self.create_repo()
             except Exception as error:
                 print("Error creating git repo.  Will continue without repo creation")
+                print(error)
 
     def get_repo(self):
         try:
@@ -50,16 +57,19 @@ class fileStructure():
         personal_access_token = keyring.get_password('github_auth', "uname")
         if not personal_access_token:
             personal_access_token = click.prompt('Please enter a Github "Personal Access Token"')
-            keyring.get_password('github_auth', "uname", personal_access_token)
+            keyring.set_password('github_auth', "uname", personal_access_token)
 
         g = Github(personal_access_token)
         org = g.get_organization('physical-computation')
+
+        print("Found organisation")
 
         # create the new repository, under the phys-comp organisation
         projectDescription = (
             """This repo is a store of the data from the print.  This repo was created by the Python tool for logging prints"""
         )
-        repo = org.create_repo(self.root_folder_name, description=projectDescription)
+
+        repo = org.create_repo(self.repo_name, description=projectDescription)
 
         readme = os.path.join(self.root_folder_name, "README.md")
         open(readme, 'wb').close()
@@ -207,6 +217,26 @@ def log(obj, ciss, spectrometer, warp, timeout_mins):
                 print_file.repo.remotes.origin.push()
             except Exception as error:
                 logging.error("An error occurred whilst pushing to git. Manually check git status.")
+
+
+@cli.command()
+@click.pass_obj
+def add_to_git(obj):
+    # click.echo('Debug is %s' % (ctx.obj['DEBUG'] and 'on' or 'off'))
+    print_file = obj['file']
+
+    if print_file.repo:
+        if click.confirm("All changes will be commited, continue?"):
+            logging.debug("Committing all changes")
+            try:
+                print_file.repo.remotes.origin.pull()
+                print_file.repo.git.add("-A")
+                print_file.repo.index.commit("Logging session complete commit")
+                print_file.repo.remotes.origin.push()
+            except Exception as error:
+                logging.error("An error occurred whilst pushing to git. Manually check git status.")
+
+
 
 if __name__ == '__main__':
     cli(obj={})

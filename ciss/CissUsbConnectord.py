@@ -4,22 +4,22 @@
 #
 #Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:#
 #
-# 1. Redistributions of source code must retain the above copyright notice, 
+# 1. Redistributions of source code must retain the above copyright notice,
 #    this list of conditions and the following disclaimer.
 #
-# 2. Redistributions in binary form must reproduce the above copyright notice, 
-#    this list of conditions and the following disclaimer in the documentation and/or 
+# 2. Redistributions in binary form must reproduce the above copyright notice,
+#    this list of conditions and the following disclaimer in the documentation and/or
 #    other materials provided with the distribution.
 #
-# 3. Neither the name of the copyright holder nor the names of its contributors may be used to 
+# 3. Neither the name of the copyright holder nor the names of its contributors may be used to
 #    endorse or promote products derived from this software without specific prior written permission.
 #
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
-# INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. 
-# IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, 
-# EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; 
+# INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+# IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+# EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
 # LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
-# WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
+# WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #
@@ -28,7 +28,7 @@
 # The script can be configured by CISS_sensor.ini and writes data to dataStream.csv or detectedEvents.csv, this can be
 # changed with dataFileLocation, dataFileLocationEvent and iniFileLocation; output to stdout can be configured with printInformation and printInformation_Conf.
 # printInformation_Conf is showing the commands configuring the sensor node as well as the respective acknowledgements
-# printInformation is showing the streamed sensor values or the events. In case of streaming with maximum sampling rate for several sensor 
+# printInformation is showing the streamed sensor values or the events. In case of streaming with maximum sampling rate for several sensor
 # it is suggested to set printInformation to false, otherwise (at least on some systems) data could be lost.
 #
 # Important is the correct usb interface, usually /dev/ttyACM0 or COM8 for example. Please update the corresponding value in CISS_sensor.ini
@@ -36,11 +36,11 @@
 # There are three open topics with CISS firmware DataStreamer v02.01.00:
 # - a configuration of individual sampling periods for acceleration, gyro and magnetometer is not possible.
 #   The sensor node always uses the same sampling rate for all inertial sensors.
-# - After using 2kHz streaming of the acceleration sensor the node will go to reset and therefore any existing handles to the COM port must be freed 
+# - After using 2kHz streaming of the acceleration sensor the node will go to reset and therefore any existing handles to the COM port must be freed
 #
 #History:
 #
-#	JS     Change delay between a send of commands to the CISS device from 0.05 (50ms) to 0.2    (200 ms) 
+#	JS     Change delay between a send of commands to the CISS device from 0.05 (50ms) to 0.2    (200 ms)
 #
 #
 # The ini-file CISS_sensor.ini looks like:
@@ -69,12 +69,12 @@
 # port = COM30
 #
 # It is possible to enable or disable streaming of acceleration (acc), gyro (gyr), magnetometer (mag), environmental (env) and light data.
-# Environmental data contains temperature, humidity, pressure. Noise is currently not implemented. 
+# Environmental data contains temperature, humidity, pressure. Noise is currently not implemented.
 # The sampling rates for inertial and environmental datacan be configured with period_inert_us and period_env_us
 # in microseconds. An individual name or id can be given with sensorid, the used serial port is given in port.
-# If the event detection mode of one of the sensors is selected, the possible selection of additional streaming modes is overruled. 
+# If the event detection mode of one of the sensors is selected, the possible selection of additional streaming modes is overruled.
 # period_inert_us and period_env_us is also used in event detection mode for the sampling of the respective sensors.
-# Special operation mode "Statistical Operation Mode" is not implemented yet.  
+# Special operation mode "Statistical Operation Mode" is not implemented yet.
 #
 
 # This is a modified version of this driver, to work with Python 3.  This was completed using 2to3, and changing
@@ -87,7 +87,7 @@ import serial, signal, configparser, os, csv, time
 
 
 dataFileLocationEvent = 'detectedEvents.csv'
-iniFileLocation = 'CISS_sensor.ini'
+iniFileLocation = 'ciss/CISS_sensor.ini'
 printInformation = False
 printInformation_Conf = True
 
@@ -101,14 +101,14 @@ def s16(value):
 def str2bool(v):
     return v.lower() in ("yes", "true", "t", "1")
 
-#configure acc range    
+#configure acc range
 def config_acc_range(ser, acc_range):
     allowed_acc_ranges = [2,4,8,16]
     #only allow valid acc_ranges
     if acc_range in allowed_acc_ranges:
         print(('set range of accel sensor to ' + str(acc_range) + 'g'))
         conf_buff = bytearray([0xfe, 0x03, 0x80, 0x04, acc_range])
-        write_conf(ser, conf_buff)               
+        write_conf(ser, conf_buff)
     else:
         if printInformation_Conf: print('No valid acc_range given. CISS will operate with default or last valid value')
 
@@ -132,8 +132,8 @@ def write_conf(ser, conf_buf):
         if printInformation_Conf: print("0x{:x}".format(el), end=' ')
     if printInformation_Conf: print()
     ser.write(conf_buf)
-    time.sleep(0.2)						 # delay between 2 Commands to the CISS device 
-    
+    time.sleep(0.2)						 # delay between 2 Commands to the CISS device
+
 # simple helper functions to parse the content of the payload
 def parse_inert_vec(data):
     x = s16(data[0] | (data[1]<<8))
@@ -194,10 +194,10 @@ def parse_event_detection(data):
     Pressure = (data[1] & 0x0c) >> 2
     Light = (data[1] & 0x30) >> 4
     Noise = (data[1] & 0xc0) >> 6
-    if Accel == 1: 
+    if Accel == 1:
         write_to_csv_event(sensorid, "Accel : overshoot", int(time.time()*1000))
         if printInformation: print("Accel : overshoot")
-    if Accel == 3: 
+    if Accel == 3:
         write_to_csv_event(sensorid, "Accel : undershoot", int(time.time()*1000))
         if printInformation: print("Accel : undershoot")
     if Gyro == 1:
@@ -215,7 +215,7 @@ def parse_event_detection(data):
     if Temp == 1:
         write_to_csv_event(sensorid, "Temp : overshoot", int(time.time()*1000))
         if printInformation: print("Temp : overshoot")
-    if Temp == 3: 
+    if Temp == 3:
         write_to_csv_event(sensorid, "Temp : undershoot", int(time.time()*1000))
         if printInformation: print("Temp : undershoot")
     if Hum == 1:
@@ -224,7 +224,7 @@ def parse_event_detection(data):
     if Hum == 3:
         write_to_csv_event(sensorid, "Hum : undershoot", int(time.time()*1000))
         if printInformation: print("Hum : undershoot")
-    if Pressure == 1: 
+    if Pressure == 1:
         write_to_csv_event(sensorid, "Pressure : overshoot", int(time.time()*1000))
         if printInformation: print("Pressure : overshoot")
     if Pressure == 3:
@@ -292,7 +292,7 @@ class StreamingConfig:
     def configure(self, ser, flgSetSamplingRateOnly):
         if ((self.streaming_enabled or flgSetSamplingRateOnly) and self.streaming_period>0):
             if printInformation_Conf: print(("configure period:",self.streaming_period))
-                       
+
             conf_buff = bytearray([0xfe, self.cfg_length])
             conf_buff.append(self.cfg_id)
             conf_buff.append(2)
@@ -302,10 +302,10 @@ class StreamingConfig:
                 k+=1
 
             write_conf(ser, conf_buff)
-        if (self.streaming_enabled and (self.streaming_period>0) and (flgSetSamplingRateOnly==0)):  
+        if (self.streaming_enabled and (self.streaming_period>0) and (flgSetSamplingRateOnly==0)):
             self.enable(ser)
-        
-    
+
+
 
 # Configuration of the different event modes. This is separated from the sensor class
 # because the event information can be configured individually for each sensor
@@ -343,12 +343,12 @@ class EventConfig:
                         conf_buff.append(128)
                         if printInformation_Conf: print('Temperature limited to -128' )
                     else:
-                        conf_buff.append((256 + self.event_threshold[i])%256)            
-                else:    
+                        conf_buff.append((256 + self.event_threshold[i])%256)
+                else:
                     for j in range(self.cfg_length[i]):
                        conf_buff.append((int(self.event_threshold[i]) >> (j*8)) & 0xff)
                 write_conf(ser, conf_buff)
- 
+
 
 
 def check_payload(payload):
@@ -398,7 +398,7 @@ def write_to_csv_event(id, event, tstamp):
     with open(dataFileLocationEvent, "a") as csvOpen:
         csvobj = csv.writer(csvOpen, dialect='excel')
         csvobj.writerow([id, tstamp, event])
-           
+
 out = 0
 
 class CISSNode:
@@ -425,11 +425,11 @@ class CISSNode:
         streaming_gyr = StreamingConfig("inertial_gyr", 0x82, False,  100000, 0x82, 6)
         streaming_mag = StreamingConfig("inertial_mag", 0x81, False,  100000, 0x81, 6)
         streaming_env = StreamingConfig("inertial_env", 0x83, False, 1000000, 0x83, 4)
-        # light sensor 
+        # light sensor
         streaming_light = StreamingConfig("inertial_lig", 0x84, False, 1000000, 0x84, 4)
-        self.streaminglist = {"env": streaming_env, 
+        self.streaminglist = {"env": streaming_env,
                               "acc": streaming_acc,
-                              "mag": streaming_mag, 
+                              "mag": streaming_mag,
                               "gyr": streaming_gyr,
                               "light": streaming_light}
         event_acc = EventConfig("event_acc", 0x80, False, [0], [2], [3])
@@ -438,9 +438,9 @@ class CISSNode:
         event_env = EventConfig("event_env", 0x83, False, [0,0,0], [1,1,3], [7,8,9])
         event_noise = EventConfig("event_noise", 0x85, False, [0], [2], [3])
         event_light = EventConfig("event_light", 0x84, False, [0], [3], [3])
-        self.eventlist = {"env": event_env, 
+        self.eventlist = {"env": event_env,
                           "acc": event_acc,
-                          "mag": event_mag, 
+                          "mag": event_mag,
                           "gyr": event_gyr,
                           "noise": event_noise,
                           "light": event_light }
@@ -448,15 +448,15 @@ class CISSNode:
 
         # read valus from ini file
         self.get_ini_config()
-        
+
         # connect to COM port
         self.connect()
-        
+
         self.checkEventEnabled()
         # disable all sensors before configuration
         self.disable_sensors()
-        
-        # configure the sensors as given in the CISS_sensor.ini file  
+
+        # configure the sensors as given in the CISS_sensor.ini file
         self.config_sensors()
 
     def get_ini_config(self):
@@ -464,7 +464,7 @@ class CISSNode:
         global iniFileLocation
 
         if not os.path.exists(iniFileLocation):
-            sIRConf = configparser.ConfigParser()       
+            sIRConf = configparser.ConfigParser()
             sIRConf.add_section("sensorcfg")
             sIRConf.set("sensorcfg", "sensorid", "Dummy")
             sIRConf.set("sensorcfg", "acc_stream", "true")
@@ -519,7 +519,7 @@ class CISSNode:
         self.eventlist["gyr"].event_threshold = [int(snIniConfig.get("sensorcfg", "gyr_threshold"))]
         self.eventlist["light"].event_enabled = str2bool(snIniConfig.get("sensorcfg", "light_event"))
         self.eventlist["light"].event_threshold = [int(snIniConfig.get("sensorcfg", "light_threshold"))]
-        #noise is not actually not streamed over USB 
+        #noise is not actually not streamed over USB
         self.eventlist["noise"].event_enabled = str2bool(snIniConfig.get("sensorcfg", "noise_event"))
         self.eventlist["noise"].event_threshold = [int(snIniConfig.get("sensorcfg", "noise_threshold"))]
         self.streaminglist["env"].streaming_period = sample_period_env_us
@@ -558,10 +558,10 @@ class CISSNode:
             conf_buff = bytearray([0xfe, 0x02, 0xfc, 0x00])
             write_conf(self.ser, conf_buff)
 
-        #If 2KHz streaming is enabled, the following will trigger a reset    
-        if self.streaminglist["acc"].streaming_enabled :      
+        #If 2KHz streaming is enabled, the following will trigger a reset
+        if self.streaminglist["acc"].streaming_enabled :
             self.streaminglist["acc"].disable(self.ser)
-            
+
     def enable_sensors(self):
         for elem in self.streaminglist.values():
             if elem.streaming_enabled:
@@ -592,7 +592,7 @@ class CISSNode:
 
     def stream(self):
         global out
-    
+
         sof = b'\xfe'
         data = []
         sub_payload = []
@@ -618,36 +618,36 @@ class CISSNode:
 
     def config_sensors(self):
         # Configure range of acc if acc streaming or threshold detection is enabled
-        # As long as only acc sensor can has a configurable range his will not be 
-        # handled by a separate method of StreamingConfig or EventConfig 
-        
-        if (self.eventlist["acc"].event_enabled or self.streaminglist["acc"].streaming_enabled): 
-            config_acc_range(self.ser, self.acc_range)       
-                        
+        # As long as only acc sensor can has a configurable range his will not be
+        # handled by a separate method of StreamingConfig or EventConfig
+
+        if (self.eventlist["acc"].event_enabled or self.streaminglist["acc"].streaming_enabled):
+            config_acc_range(self.ser, self.acc_range)
+
         # flag to signal if any event is configured
         flgAnyEventConfigured = 0
-        
+
         #check if one of the inertial sensors is enabled in event detection mode, if yes set the sample period
         if (self.eventlist["acc"].event_enabled or self.eventlist["mag"].event_enabled or self.eventlist["gyr"].event_enabled):
             self.streaminglist["acc"].configure(self.ser, 1)
             flgAnyEventConfigured = 1
-        #check if env, light or noise is enabled in event detection mode, if yes set the sample period 
-        if (self.eventlist["env"].event_enabled or self.eventlist["light"].event_enabled or self.eventlist["noise"].event_enabled):            
+        #check if env, light or noise is enabled in event detection mode, if yes set the sample period
+        if (self.eventlist["env"].event_enabled or self.eventlist["light"].event_enabled or self.eventlist["noise"].event_enabled):
             self.streaminglist["env"].configure(self.ser, 1)
             flgAnyEventConfigured = 1
- 
+
         #configure the sensors for datastreaming only if no event detection mode is configured for any of the sensors
         if flgAnyEventConfigured==0:
             for elem in self.streaminglist.values():
                 elem.configure(self.ser, 0)
-           
+
         for elem in self.eventlist.values():
-            elem.configure(self.ser)   
+            elem.configure(self.ser)
 
         #send the start event detection mode only at the end of the event mode configuration (i.e. respective thresholds)
-        if flgAnyEventConfigured == 1:            
-            self.eventlist["acc"].enable(self.ser)   #enabling of the event mode, therefore use "acc" instance, 
-            
+        if flgAnyEventConfigured == 1:
+            self.eventlist["acc"].enable(self.ser)   #enabling of the event mode, therefore use "acc" instance,
+
 
 def ctrl_c_handler(signal, frame,node):
     raise Exception("")
@@ -668,4 +668,3 @@ def ctrl_c_handler(signal, frame,node):
 #         node.disconnect()
 #         time.sleep(1)
 #         exit(0)
-
