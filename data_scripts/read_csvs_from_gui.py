@@ -3,7 +3,7 @@ import matplotlib
 import matplotlib.pyplot as plt
 import os
 
-# This program takes the data from a bunch os CSVs as outputted by the NIRScan GUI
+# This program takes the data from multiple CSVs as outputted by the NIRScan GUI
 # and sums the readings (sample column) to obtain a smoother output.
 
 

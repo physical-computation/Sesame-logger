@@ -8,6 +8,11 @@ from scipy.stats import mode
 import numpy
 
 
+# This plots the enviromental data from ciss for an entire folder, and removes noise from the readings.  This has
+# only been tested with data from the sesame-004 repo (private).
+
+# TODO  This is extremely messy, needs some parts breaking out into fucntions (but it works)
+
 matplotlib.use('TkAgg')
 
 

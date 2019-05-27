@@ -7,6 +7,9 @@ import matplotlib.dates as mdates
 from scipy.stats import mode
 
 
+# This reads a series of CSVs from the CISS from a given folder, concatenates the data, and plots the grpahs of
+# acceleration against time
+
 matplotlib.use('TkAgg')
 
 

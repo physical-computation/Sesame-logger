@@ -7,6 +7,10 @@ import matplotlib.dates as mdates
 from scipy.stats import mode
 from scipy.signal import find_peaks
 
+# This reads data from the AS7263 / AS7262 spectrometers, (recorded by sesame_logger) with headings:
+# "timestamp", "1", "2", "3", "4", "5", "6"
+# This then sums the readings from each sample, and plots the results, along with peaks which are found using a
+# combination of a gaussian smoothing operation, and the Scipy find_peaks function
 
 matplotlib.use('TkAgg')
 
